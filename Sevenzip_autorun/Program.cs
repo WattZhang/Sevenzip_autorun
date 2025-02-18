@@ -6,22 +6,29 @@ internal class Program
     private static void Main(string[] args)
     {
         SevenZip.SevenZipBase.SetLibraryPath(@"D:\7-Zip\7z.dll");
-        string sourcedir = @"L:\游戏\解压用缓冲区\7ziptest";
-        //拉取完整任务列表
-        var l = ShowFiles(sourcedir);
-        int number = GetNumber();
-        //鲁棒性检查
-        if (number > 0 & number <= l.Length)
-        {
-            //单层解压
-            MustFinish(l[number - 1]);
-        }
+        string sourcedir;//= @"L:\游戏\解压用缓冲区\7ziptest";
+        Console.Write("输入解压目录:");
+        sourcedir = Console.ReadLine();
+        if (!Path.Exists(sourcedir))
+            Console.Write("目录不存在，中断");
         else
         {
-            Console.WriteLine("未存在的文件序号");
-            number = GetNumber();
-        }
+            //拉取完整任务列表
+            var l = ShowFiles(sourcedir);
+            int number = GetNumber();
+            //鲁棒性检查
+            if (number > 0 & number <= l.Length)
+            {
+                //单层解压
+                MustFinish(l[number - 1]);
+            }
+            else
+            {
+                Console.WriteLine("未存在的文件序号");
+                number = GetNumber();
+            }
             Console.WriteLine("Mission Complete!");
+        }
     }
 
     /// <summary>
@@ -65,7 +72,8 @@ internal class Program
 
     public static bool IsUnpackFinish(string inpath) 
     {
-        if (Directory.GetFiles(inpath).Length == GetZipFiles(inpath).Count)
+        //fix 20250218 搜索文件子目录
+        if (Directory.GetFiles(inpath, "", SearchOption.AllDirectories).Length == GetZipFiles(inpath).Count)
             return false;
         else
             return true;
