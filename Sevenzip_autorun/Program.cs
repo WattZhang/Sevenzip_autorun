@@ -19,7 +19,7 @@ internal class Program
             //鲁棒性检查
             if (number > 0 & number <= l.Length)
             {
-                //单层解压
+                //解压
                 MustFinish(l[number - 1]);
             }
             else
@@ -70,6 +70,11 @@ internal class Program
         return l;
     }
 
+    /// <summary>
+    /// 判断解压是否完成
+    /// </summary>
+    /// <param name="inpath"></param>
+    /// <returns></returns>
     public static bool IsUnpackFinish(string inpath) 
     {
         //fix 20250218 搜索文件子目录
@@ -111,12 +116,35 @@ internal class Program
         }
         ;
     }
-    public static void Unzip(string inpath, string outpath)
+
+    /// <summary>
+    /// 解压文件
+    /// </summary>
+    /// <param name="inpath"></param>
+    /// <param name="outpath"></param>
+    /// <param name="password"></param>
+    public static void Unzip(string inpath, string outpath,string password = "")
     {
-        SevenZipExtractor extractor = new SevenZipExtractor(inpath);
-        extractor.ExtractArchive(outpath);
+        SevenZipExtractor extractor = new SevenZipExtractor(inpath,password);
+        extractor.Extracting += (sender, e) =>
+        {
+            Console.WriteLine("正在解压 " + (e.PercentDone).ToString());
+        };
+        try
+        {
+            extractor.ExtractArchive(outpath);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+            throw;
+        }
     }
 
+    /// <summary>
+    /// 获取解压序号
+    /// </summary>
+    /// <returns></returns>
     public static int GetNumber() 
     {
         //解压序号
